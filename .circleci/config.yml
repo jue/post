@@ -20,9 +20,10 @@ jobs:
       - run: rm -rf docs
       - run: npm install acyort -g
       - run: npm i
-      - run: TOKEN=${gh_token} acyort flow
-      - run: git add .
-      - run: git config user.name "xiangjianfeng"
-      - run: git config user.email "i@xiangjianfeng.com"
-      - run: git commit -m "Updated by circleci - `date`"
-      - run: git push -q https://${gh_token}@github.com/xiangjianfeng/post.git master:master
+      - run: acyort build
+      - run: ls
+      # - run: git add .
+      # - run: git config user.name "xiangjianfeng"
+      # - run: git config user.email "i@xiangjianfeng.com"
+      # - run: git commit -m "Updated by circleci - `date`"
+      # - run: git push -q https://${gh_token}@github.com/xiangjianfeng/post.git master:master
