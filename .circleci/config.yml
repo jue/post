@@ -19,6 +19,7 @@ jobs:
       - checkout
       - run: npm install acyort -g
       - run: acyort init 
+      - run: ls
       - run: cp config.bak.yml config.yml 
       - run: npm i # 可选，如果你需要安装 npm 插件
       - run: acyort build  
