@@ -20,7 +20,7 @@ jobs:
       # - run: rm -rf docs
       - run: npm install acyort -g
       - run: npm i
-      - run: acyort build
+      - run: acyort flow
       - run: git checkout .  
       - run: ls
       # - run: git add .
