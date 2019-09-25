@@ -4,6 +4,8 @@ public_dir: public
 
 timezone: Asia/Shanghai
 
+theme: donob
+
 menu:
   archives: /archives/
   tags: /tags/
