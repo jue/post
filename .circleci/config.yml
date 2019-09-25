@@ -1,0 +1,28 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      - image: node:latest
+
+    working_directory: ~/acyort
+
+    branches:
+      only:
+        - master
+
+    steps:
+      - checkout
+      - run: rm -rf docs
+      - run: npm install acyort -g
+      - run: npm i
+      - run: TOKEN=${gh_token} acyort flow
+      - run: git add .
+      - run: git config user.name "xiangjianfeng"
+      - run: git config user.email "i@xiangjianfeng.com"
+      - run: git commit -m "Updated by circleci - `date` [ci skip]"
+      - run: git push -q https://${gh_token}@github.com/xiangjianfeng/post.git master:master

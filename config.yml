@@ -1,0 +1,22 @@
+template: '@acyort/pigeon'
+
+plugins:
+  - hook.js
+  - '@acyort/pigeon'
+
+repository: xiangjianfeng/post
+
+favicon: data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoBAMAAAB+0KVeAAAAGFBMVEUAAAA7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozsmr7C1AAAAB3RSTlMA8o3HRiCjAZ7XVAAAAFRJREFUKM9jGAUMDE6GwiroYkHi5eWFqqhirOnlQFAWgCLIVA4GCiiCjhBBERRBdYhgEYqgOUSwGEVQHCJYSEgQoZ2QRQgnEXI8wpsEAgQRdKOAAQCvriuz6lBMNwAAAABJRU5ErkJggg==
+
+public: docs
+
+timezone: Asia/Shanghai
+
+menu:
+  archives: /archives/
+  tags: /tags/
+  about: /about/
+
+perpage: 7
+
+title: XiangJianfeng
