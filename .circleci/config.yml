@@ -24,8 +24,6 @@ jobs:
       - run: git checkout .  
       - run: git checkout gh-pages # 静态文件存放分支
       - run: git reset --hard origin/gh-pages
-      - run: cp -R public/* . 
-      - run: rm -R scripts themes public 
       - run: git add .
       - run: git config user.name "xiangjianfeng" # 你的 GitHub 用户名
       - run: git config user.email "i@xiangjianfeng.com" # 你的 GitHub 邮箱
