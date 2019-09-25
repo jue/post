@@ -1,9 +1,3 @@
-template: '@acyort/pigeon'
-
-plugins:
-  - hook.js
-  - '@acyort/pigeon'
-
 user: xiangjianfeng
 repository: xiangjianfeng/post
 public_dir: public
