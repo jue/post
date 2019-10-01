@@ -1,37 +1,25 @@
-# Javascript Node CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-javascript/ for more details
-#
 version: 2
 jobs:
   build:
     docker:
-      # specify the version you desire here
       - image: node:latest
-
     working_directory: ~/acyort
-
     branches:
       only:
         - master
-
     steps:
       - checkout
-      - run: npm install acyort -g
-      - run: acyort init 
-      - run: ls
-      - run: cp config.bak.yml config.yml 
-      - run: npm i # 可选，如果你需要安装 npm 插件
-      - run: acyort build  
-      - run: git checkout .  
-      - run: git checkout gh-pages # 静态文件存放分支
-      - run: git reset --hard origin/gh-pages
-      - run: cp -R public/* . 
-      - run: rm config.bak.yml 
-      - run: rm -R scripts themes public 
-      - run: git add .
-      - run: git config user.name "xiangjianfeng" # 你的 GitHub 用户名
-      - run: git config user.email "i@xiangjianfeng.com" # 你的 GitHub 邮箱
-      - run: git commit -m "Updated by circleci - `date`"
-      # 下面填写你的 usename 和 repository  
-      - run: git push -q https://${gh_token}@github.com/jue/post.git gh-pages:gh-pages 
+      - restore_cache:
+          keys:
+            - yarn-packages-{{ checksum "yarn.lock" }}
+      - run: yarn install
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: yarn-packages-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/.cache/yarn
+      - run: yarn deploy
+      - run: cd public
+      - run: git config user.name "xiangjianfeng"
+      - run: git config user.email "i@xiangjianfeng.com"
+      - run: git push --force --quiet "https://${E_CODING}@e.coding.net/jue/post.git" master:pages

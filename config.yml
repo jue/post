@@ -1,17 +1,40 @@
-user: xiangjianfeng
+# Base Config
+
+# site
+# default "AcyOrt", "A Node.js blog tool powered by GitHub."
+title: XiangJianfeng
+description: XiangJianfeng's blog.
+
+# rss
+# set false if not need rss output
+# default "rss.xml"
+rss: true
+
+# site url. you can set as 'http://yoursite.com/child' if necessary
+# please add 'http://' or 'https://'
+# default "https://acyortjs.github.io"
+url: https://blog.xiangjianfeng.com
+
+# theme
+# default "ccc45"
+template: acyort-templates-donob-plus
+
+# menu
+menu:
+  Archives: /archives/
+  Tags: /tags/
+  About: /about/
+  Repo: /repo/
+
 repository: jue/post
-public_dir: public
+
+pageSize:
+  posts: 8
+
+public: public
 
 timezone: Asia/Shanghai
-
-theme: donob
-
-menu:
-  archives: /archives/
-  tags: /tags/
-  about: /about/
-
-perpage: 7
-
-title: XiangJianfeng
-token: de99e315bc22ab16773b1f17cb0f1ec06a1b84b0
+plugins:
+  - acyort-plugin-fetch-issues
+  - acyort-donob-renderer
+  - acyort-plugin-rss
