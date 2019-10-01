@@ -19,8 +19,9 @@ jobs:
           paths:
             - ~/.cache/yarn
       - run: yarn deploy
-      - run: cd public
       - run: ls -all
+      - run: pwd
+      - run: cd public
       - run: git config user.name "xiangjianfeng"
       - run: git config user.email "i@xiangjianfeng.com"
       - run: git push --force --quiet "https://${E_CODING}@e.coding.net/jue/post.git" master:pages
