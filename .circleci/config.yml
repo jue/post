@@ -19,9 +19,6 @@ jobs:
           paths:
             - ~/.cache/yarn
       - run: yarn deploy
-      - run: ls -all
-      - run: pwd
-      - run: cd public
       - run: git config user.name "xiangjianfeng"
       - run: git config user.email "i@xiangjianfeng.com"
-      - run: git push --force --quiet "https://${E_CODING}@e.coding.net/jue/post.git" master:pages
+      - run: npx gh-pages -d public -r "https://${E_CODING}@e.coding.net/jue/post.git" -b pages -m "Updated by circleci - `date`"
