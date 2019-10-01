@@ -17,7 +17,7 @@ url: https://blog.xiangjianfeng.com
 
 # theme
 # default "ccc45"
-template: '@acyort/pigeon'
+template: '@template/donob'
 
 # menu
 menu:
