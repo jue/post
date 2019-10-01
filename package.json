@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/zWingz/my-blog-config"
+    "url": "https://github.com/jue/post"
   },
   "keywords": [
     "blog"
@@ -17,9 +17,9 @@
   "author": "zwing",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/zWingz/my-blog-config/issues"
+    "url": "https://github.com/jue/post/issues"
   },
-  "homepage": "https://github.com/zWingz/my-blog-config#readme",
+  "homepage": "https://github.com/jue/post#readme",
   "dependencies": {
     "acyort": "^3.3.1",
     "acyort-donob-renderer": "^1.6.4",
