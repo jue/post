@@ -2,17 +2,17 @@
 title: "如何重置supabase里所有表、函数和触发器"
 description: "最近在开发过程中，经常会遇到需要重置Supabase数据库的情况。这些情况包括： 1. 开发阶段的数据污染：在开发和测试阶段，我们可能会产生大量的测试数据，这些数据在项目上线或迭代到下一个阶段时就变得无用，甚至会干扰系统的正常运行。 2. 数据库结构变更：当项目需求发生重大变化，数据库的表结构、关系..."
 date: 2025-05-05
-lastUpdated: 2025-09-02
+lastUpdated: 2026-01-13
 authors:
   - name: "jue"
     link: "https://github.com/jue"
     avatar: "https://avatars.githubusercontent.com/u/377499?v=4"
 categories:
   - "Tech Talk"
-wordCount: 1267
-readingTime: 4
+wordCount: 1653
+readingTime: 6
 githubIssue: 1
-githubUrl: "https://github.com/jue/jue.github.io/issues/1"
+githubUrl: "https://github.com/jue/post/issues/1"
 ---
 最近在开发过程中，经常会遇到需要重置Supabase数据库的情况。这些情况包括：
 
@@ -93,41 +93,50 @@ WHERE table_schema = 'public';
 以下是一段完整的 SQL 脚本，可以帮助您删除 Supabase 数据库中的所有表、函数、触发器、序列和视图。您可以直接复制粘贴到 Supabase 的 SQL 编辑器中运行：
 
 ```sql
+-- ========================================
+-- Supabase 数据库完整清理脚本
+-- ========================================
+-- 此脚本会清理 public schema 下的所有自定义对象
+-- 保留 auth、storage 和系统表
+-- ========================================
+
 -- 第一步：删除所有触发器
-DO $$ 
+DO $$
 DECLARE
     trigger_stmt TEXT;
 BEGIN
-    FOR trigger_stmt IN 
+    FOR trigger_stmt IN
         SELECT 'DROP TRIGGER IF EXISTS "' || trigger_name || '" ON "' || event_object_table || '" CASCADE;'
         FROM information_schema.triggers
         WHERE trigger_schema = 'public'
     LOOP
         EXECUTE trigger_stmt;
+        RAISE NOTICE '已删除触发器: %', trigger_stmt;
     END LOOP;
 END $$;
 
 -- 第二步：删除所有视图
-DO $$ 
+DO $$
 DECLARE
     view_stmt TEXT;
 BEGIN
-    FOR view_stmt IN 
+    FOR view_stmt IN
         SELECT 'DROP VIEW IF EXISTS "' || table_name || '" CASCADE;'
         FROM information_schema.views
         WHERE table_schema = 'public'
     LOOP
         EXECUTE view_stmt;
+        RAISE NOTICE '已删除视图: %', view_stmt;
     END LOOP;
 END $$;
 
--- 第三步：删除所有表
-DO $$ 
+-- 第三步：删除所有表（保留 auth、storage 和系统表）
+DO $$
 DECLARE
     table_stmt TEXT;
 BEGIN
-    FOR table_stmt IN 
-        SELECT 'DROP TABLE IF EXISTS "' || tablename || '" CASCADE;' 
+    FOR table_stmt IN
+        SELECT 'DROP TABLE IF EXISTS "' || tablename || '" CASCADE;'
         FROM pg_tables
         WHERE schemaname = 'public'
         AND tablename NOT LIKE 'pg_%'
@@ -135,36 +144,101 @@ BEGIN
         AND tablename NOT LIKE 'storage_%'
     LOOP
         EXECUTE table_stmt;
+        RAISE NOTICE '已删除表: %', table_stmt;
     END LOOP;
 END $$;
 
 -- 第四步：删除所有序列
-DO $$ 
+DO $$
 DECLARE
     seq_stmt TEXT;
 BEGIN
-    FOR seq_stmt IN 
+    FOR seq_stmt IN
         SELECT 'DROP SEQUENCE IF EXISTS "' || sequence_name || '" CASCADE;'
         FROM information_schema.sequences
         WHERE sequence_schema = 'public'
     LOOP
         EXECUTE seq_stmt;
+        RAISE NOTICE '已删除序列: %', seq_stmt;
     END LOOP;
 END $$;
 
--- 第五步：删除所有函数
-DO $$ 
+-- 第五步：删除所有自定义函数（排除扩展提供的函数）
+DO $$
 DECLARE
     func_stmt TEXT;
 BEGIN
-    FOR func_stmt IN 
+    FOR func_stmt IN
         SELECT 'DROP FUNCTION IF EXISTS ' || ns.nspname || '.' || proname || '(' || oidvectortypes(proargtypes) || ') CASCADE;'
-        FROM pg_proc 
+        FROM pg_proc
         INNER JOIN pg_namespace ns ON (pg_proc.pronamespace = ns.oid)
         WHERE ns.nspname = 'public'
+        AND NOT EXISTS (
+            SELECT 1 FROM pg_depend d
+            JOIN pg_extension e ON d.refobjid = e.oid
+            WHERE d.objid = pg_proc.oid AND d.deptype = 'e'
+        )
     LOOP
         EXECUTE func_stmt;
+        RAISE NOTICE '已删除函数: %', func_stmt;
     END LOOP;
+END $$;
+
+-- 第六步：删除所有自定义类型（可选）
+DO $$
+DECLARE
+    type_stmt TEXT;
+BEGIN
+    FOR type_stmt IN
+        SELECT 'DROP TYPE IF EXISTS "' || t.typname || '" CASCADE;'
+        FROM pg_type t
+        JOIN pg_namespace n ON t.typnamespace = n.oid
+        WHERE n.nspname = 'public'
+        AND t.typtype = 'c'
+    LOOP
+        EXECUTE type_stmt;
+        RAISE NOTICE '已删除类型: %', type_stmt;
+    END LOOP;
+END $$;
+
+-- 第七步：删除所有扩展（除了Supabase必需的扩展）
+-- Supabase必需的扩展：plpgsql, supabase_vault, pg_cron, pg_net, pgjwt, pg_graphql, uuid-ossp, pgcrypto
+DO $$
+DECLARE
+    ext_name TEXT;
+BEGIN
+    FOR ext_name IN
+        SELECT extname FROM pg_extension 
+        WHERE extname NOT IN ('plpgsql', 'supabase_vault', 'pg_cron', 'pg_net', 'pgjwt', 'pg_graphql', 'uuid-ossp', 'pgcrypto', 'btree_gist', 'btree_gin')
+    LOOP
+        EXECUTE 'DROP EXTENSION IF EXISTS "' || ext_name || '" CASCADE;';
+        RAISE NOTICE '已删除扩展: %', ext_name;
+    END LOOP;
+END $$;
+
+-- ========================================
+-- 清理完成提示
+-- ========================================
+DO $$
+BEGIN
+    RAISE NOTICE '========================================';
+    RAISE NOTICE '数据库清理完成！';
+    RAISE NOTICE '========================================';
+    RAISE NOTICE '已清理的内容：';
+    RAISE NOTICE '- 所有触发器';
+    RAISE NOTICE '- 所有视图';
+    RAISE NOTICE '- 所有自定义表';
+    RAISE NOTICE '- 所有序列';
+    RAISE NOTICE '- 所有自定义函数';
+    RAISE NOTICE '- 所有自定义类型';
+    RAISE NOTICE '- 所有非必需扩展';
+    RAISE NOTICE '========================================';
+    RAISE NOTICE '保留的内容：';
+    RAISE NOTICE '- auth_* 表（认证系统）';
+    RAISE NOTICE '- storage_* 表（存储系统）';
+    RAISE NOTICE '- pg_* 表（系统表）';
+    RAISE NOTICE '- Supabase必需扩展';
+    RAISE NOTICE '========================================';
 END $$;
 ```
 
